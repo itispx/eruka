@@ -1,19 +1,15 @@
 package cloudwatch
 
 import (
-	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatch"
+	"github.com/itispx/eruka/aws/session"
 )
 
 var (
-	sess = session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(os.Getenv("AWS_REGION")),
-	}))
-	CloudWatchSession = cloudwatch.New(sess)
+	CloudWatchSession = cloudwatch.New(session.New())
 )
 
 func MetricDataQuery(id *string, namespace *string, metricName *string, dimensionName *string, dimensionValue *string) *cloudwatch.MetricDataQuery {

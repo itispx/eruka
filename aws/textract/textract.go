@@ -4,20 +4,18 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/textract"
+	"github.com/itispx/eruka/aws/session"
 )
 
 var (
-	textractSession = textract.New(session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(os.Getenv("AWS_REGION")),
-	})))
-	RAW        = "RAW"
-	QUERIES    = textract.FeatureTypeQueries
-	FORMS      = textract.FeatureTypeForms
-	TABLES     = textract.FeatureTypeTables
-	LAYOUT     = textract.FeatureTypeLayout
-	SIGNATURES = textract.FeatureTypeSignatures
+	TextractSession = textract.New(session.New())
+	RAW             = "RAW"
+	QUERIES         = textract.FeatureTypeQueries
+	FORMS           = textract.FeatureTypeForms
+	TABLES          = textract.FeatureTypeTables
+	LAYOUT          = textract.FeatureTypeLayout
+	SIGNATURES      = textract.FeatureTypeSignatures
 )
 
 type Block struct {
@@ -26,7 +24,7 @@ type Block struct {
 
 func StartDocumentAnalysis(bucket *string, name *string, s3OutputPrefix *string, featureTypes *[]string, topicArn *string, roleArn *string) (*textract.StartDocumentAnalysisOutput, error) {
 	if os.Getenv("ENV") == "dev" {
-		return textractSession.StartDocumentAnalysis(&textract.StartDocumentAnalysisInput{
+		return TextractSession.StartDocumentAnalysis(&textract.StartDocumentAnalysisInput{
 			DocumentLocation: &textract.DocumentLocation{
 				S3Object: &textract.S3Object{
 					Bucket: bucket,
@@ -40,7 +38,7 @@ func StartDocumentAnalysis(bucket *string, name *string, s3OutputPrefix *string,
 			},
 		})
 	} else {
-		return textractSession.StartDocumentAnalysis(&textract.StartDocumentAnalysisInput{
+		return TextractSession.StartDocumentAnalysis(&textract.StartDocumentAnalysisInput{
 			DocumentLocation: &textract.DocumentLocation{
 				S3Object: &textract.S3Object{
 					Bucket: bucket,
@@ -69,7 +67,7 @@ func GetDocumentAnalysis(jobId *string, paginationToken *string) (*textract.GetD
 		analysisInput.NextToken = paginationToken
 	}
 
-	analysisOutput, err := textractSession.GetDocumentAnalysis(analysisInput)
+	analysisOutput, err := TextractSession.GetDocumentAnalysis(analysisInput)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +77,7 @@ func GetDocumentAnalysis(jobId *string, paginationToken *string) (*textract.GetD
 
 func StartDocumentTextDetection(bucket *string, name *string, s3OutputPrefix *string, topicArn *string, roleArn *string) (*textract.StartDocumentTextDetectionOutput, error) {
 	if os.Getenv("ENV") == "dev" {
-		return textractSession.StartDocumentTextDetection(&textract.StartDocumentTextDetectionInput{
+		return TextractSession.StartDocumentTextDetection(&textract.StartDocumentTextDetectionInput{
 			DocumentLocation: &textract.DocumentLocation{
 				S3Object: &textract.S3Object{
 					Bucket: bucket,
@@ -92,7 +90,7 @@ func StartDocumentTextDetection(bucket *string, name *string, s3OutputPrefix *st
 			},
 		})
 	} else {
-		return textractSession.StartDocumentTextDetection(&textract.StartDocumentTextDetectionInput{
+		return TextractSession.StartDocumentTextDetection(&textract.StartDocumentTextDetectionInput{
 			DocumentLocation: &textract.DocumentLocation{
 				S3Object: &textract.S3Object{
 					Bucket: bucket,
@@ -120,7 +118,7 @@ func GetDocumentTextDetection(jobId *string, paginationToken *string) (*textract
 		analysisInput.NextToken = paginationToken
 	}
 
-	analysisOutput, err := textractSession.GetDocumentTextDetection(analysisInput)
+	analysisOutput, err := TextractSession.GetDocumentTextDetection(analysisInput)
 	if err != nil {
 		return nil, err
 	}

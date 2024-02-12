@@ -1,18 +1,13 @@
 package rds
 
 import (
-	"os"
+	"github.com/itispx/eruka/aws/session"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/rds"
 )
 
 var (
-	sess = session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(os.Getenv("AWS_REGION")),
-	}))
-	RDSSession = rds.New(sess)
+	RDSSession = rds.New(session.New())
 )
 
 func StopDBInstance(dbInstanceIdentifier *string) (*rds.StopDBInstanceOutput, error) {
