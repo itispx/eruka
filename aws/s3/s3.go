@@ -14,7 +14,7 @@ import (
 
 var (
 	cfg, _    = config.LoadDefaultConfig(context.TODO())
-	s3session = s3.New(s3.Options{
+	S3session = s3.New(s3.Options{
 		Credentials: cfg.Credentials,
 		Region:      os.Getenv("AWS_REGION"),
 	})
@@ -25,7 +25,7 @@ var (
 func UploadS3(file *[]byte, filePath *string) (*s3.PutObjectOutput, string, error) {
 	body := bytes.NewReader(*file)
 
-	result, err := s3session.PutObject(context.TODO(), &s3.PutObjectInput{
+	result, err := S3session.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket: Bucket,
 		Key:    filePath,
 		Body:   body,
@@ -35,7 +35,7 @@ func UploadS3(file *[]byte, filePath *string) (*s3.PutObjectOutput, string, erro
 }
 
 func GetS3File(filePath *string) (*s3.GetObjectOutput, error) {
-	return s3session.GetObject(context.TODO(), &s3.GetObjectInput{
+	return S3session.GetObject(context.TODO(), &s3.GetObjectInput{
 		Bucket: Bucket,
 		Key:    filePath,
 	})

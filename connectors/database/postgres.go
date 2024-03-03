@@ -27,10 +27,11 @@ func ConnectPostgresDB() error {
 			return err
 		}
 
+		dbName = credentials.DBName
+		host = credentials.Host
+		port = fmt.Sprintf(`%v`, credentials.Port)
 		user = credentials.Username
 		password = credentials.Password
-		dbName = credentials.DBName
-		port = fmt.Sprintf(`%v`, credentials.Port)
 		sslmode = "require"
 	}
 
