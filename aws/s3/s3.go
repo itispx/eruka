@@ -34,10 +34,10 @@ func UploadS3(file *[]byte, filePath *string) (*s3.PutObjectOutput, string, erro
 	return result, fmt.Sprintf("%s/%s", S3URL, *filePath), err
 }
 
-func GetS3File(filePath *string) (*s3.GetObjectOutput, error) {
+func GetS3File(key *string) (*s3.GetObjectOutput, error) {
 	return S3session.GetObject(context.TODO(), &s3.GetObjectInput{
 		Bucket: Bucket,
-		Key:    filePath,
+		Key:    key,
 	})
 }
 
