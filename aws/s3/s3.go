@@ -41,8 +41,12 @@ func GetS3File(key *string) (*s3.GetObjectOutput, error) {
 	})
 }
 
-func GetKey(filePath *string) string {
-	s := strings.Split(*filePath, S3URL)[1]
+func GetKey(filePath *string, s3URL *string) string {
+	if s3URL == nil {
+		s3URL = &S3URL
+	}
+
+	s := strings.Split(*filePath, *s3URL)[1]
 
 	for i := range s {
 		if i > 0 {
