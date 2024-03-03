@@ -22,11 +22,15 @@ var (
 	S3URL  = fmt.Sprintf("https://%s.s3.%s.amazonaws.com", os.Getenv("AWS_BUCKET"), os.Getenv("AWS_REGION"))
 )
 
-func UploadS3(file *[]byte, filePath *string) (*s3.PutObjectOutput, string, error) {
+func UploadS3(file *[]byte, filePath *string, bucket *string) (*s3.PutObjectOutput, string, error) {
+	if bucket == nil {
+		bucket = Bucket
+	}
+
 	body := bytes.NewReader(*file)
 
 	result, err := S3session.PutObject(context.TODO(), &s3.PutObjectInput{
-		Bucket: Bucket,
+		Bucket: bucket,
 		Key:    filePath,
 		Body:   body,
 	})
@@ -34,9 +38,13 @@ func UploadS3(file *[]byte, filePath *string) (*s3.PutObjectOutput, string, erro
 	return result, fmt.Sprintf("%s/%s", S3URL, *filePath), err
 }
 
-func GetS3File(key *string) (*s3.GetObjectOutput, error) {
+func GetS3File(key *string, bucket *string) (*s3.GetObjectOutput, error) {
+	if bucket == nil {
+		bucket = Bucket
+	}
+
 	return S3session.GetObject(context.TODO(), &s3.GetObjectInput{
-		Bucket: Bucket,
+		Bucket: bucket,
 		Key:    key,
 	})
 }
