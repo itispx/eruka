@@ -6,15 +6,17 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 var (
 	cfg, _    = config.LoadDefaultConfig(context.TODO())
-	S3session = s3.New(s3.Options{
+	S3Session = s3.New(s3.Options{
 		Credentials: cfg.Credentials,
 		Region:      os.Getenv("AWS_REGION"),
 	})
@@ -29,7 +31,7 @@ func UploadS3(file *[]byte, filePath *string, bucket *string) (*s3.PutObjectOutp
 
 	body := bytes.NewReader(*file)
 
-	result, err := S3session.PutObject(context.TODO(), &s3.PutObjectInput{
+	result, err := S3Session.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket: bucket,
 		Key:    filePath,
 		Body:   body,
@@ -43,7 +45,7 @@ func GetS3File(key *string, bucket *string) (*s3.GetObjectOutput, error) {
 		bucket = Bucket
 	}
 
-	return S3session.GetObject(context.TODO(), &s3.GetObjectInput{
+	return S3Session.GetObject(context.TODO(), &s3.GetObjectInput{
 		Bucket: bucket,
 		Key:    key,
 	})
@@ -65,4 +67,35 @@ func GetKey(filePath *string, s3URL *string) string {
 	}
 	// There are 0 or 1 runes in the string.
 	return ""
+}
+
+func PresignedGet(key *string, bucket *string, dur *time.Duration) (*v4.PresignedHTTPRequest, error) {
+	if bucket == nil {
+		bucket = Bucket
+	}
+
+	presignClient := s3.NewPresignClient(S3Session)
+
+	return presignClient.PresignGetObject(context.Background(),
+		&s3.GetObjectInput{
+			Bucket: bucket,
+			Key:    key,
+		},
+		s3.WithPresignExpires(*dur),
+	)
+}
+
+func PresignedPut(key *string, bucket *string, dur *time.Duration) (*v4.PresignedHTTPRequest, error) {
+	if bucket == nil {
+		bucket = Bucket
+	}
+
+	presignClient := s3.NewPresignClient(S3Session)
+	return presignClient.PresignPutObject(context.Background(),
+		&s3.PutObjectInput{
+			Bucket: bucket,
+			Key:    key,
+		},
+		s3.WithPresignExpires(time.Minute*15))
+
 }
