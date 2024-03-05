@@ -69,7 +69,7 @@ func GetKey(filePath *string, s3URL *string) string {
 	return ""
 }
 
-func PresignedGet(key *string, bucket *string, dur *time.Duration) (*v4.PresignedHTTPRequest, error) {
+func PresignedGet(key *string, bucket *string, dur time.Duration) (*v4.PresignedHTTPRequest, error) {
 	if bucket == nil {
 		bucket = Bucket
 	}
@@ -81,11 +81,11 @@ func PresignedGet(key *string, bucket *string, dur *time.Duration) (*v4.Presigne
 			Bucket: bucket,
 			Key:    key,
 		},
-		s3.WithPresignExpires(*dur),
+		s3.WithPresignExpires(dur),
 	)
 }
 
-func PresignedPut(key *string, bucket *string, dur *time.Duration) (*v4.PresignedHTTPRequest, error) {
+func PresignedPut(key *string, bucket *string, dur time.Duration) (*v4.PresignedHTTPRequest, error) {
 	if bucket == nil {
 		bucket = Bucket
 	}
@@ -96,6 +96,5 @@ func PresignedPut(key *string, bucket *string, dur *time.Duration) (*v4.Presigne
 			Bucket: bucket,
 			Key:    key,
 		},
-		s3.WithPresignExpires(time.Minute*15))
-
+		s3.WithPresignExpires(dur))
 }
