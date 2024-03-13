@@ -24,15 +24,11 @@ var (
 	S3URL  = fmt.Sprintf("https://%s.s3.%s.amazonaws.com", os.Getenv("AWS_BUCKET"), os.Getenv("AWS_REGION"))
 )
 
-func UploadS3(file *[]byte, filePath *string, bucket *string, optFns ...func(*s3.Options)) (*s3.PutObjectOutput, string, error) {
-	if bucket == nil {
-		bucket = Bucket
-	}
-
+func UploadS3(file *[]byte, filePath *string, optFns ...func(*s3.Options)) (*s3.PutObjectOutput, string, error) {
 	body := bytes.NewReader(*file)
 
 	result, err := S3Session.PutObject(context.TODO(), &s3.PutObjectInput{
-		Bucket: bucket,
+		Bucket: Bucket,
 		Key:    filePath,
 		Body:   body,
 	}, optFns...)
@@ -67,11 +63,7 @@ func GetKey(filePath *string, s3URL *string) string {
 	return ""
 }
 
-func PresignedGet(key *string, bucket *string, dur time.Duration, optFns ...func(*s3.PresignOptions)) (*v4.PresignedHTTPRequest, error) {
-	if bucket == nil {
-		bucket = Bucket
-	}
-
+func PresignedGet(key *string, dur time.Duration, optFns ...func(*s3.PresignOptions)) (*v4.PresignedHTTPRequest, error) {
 	presignClient := s3.NewPresignClient(S3Session)
 
 	options := make([]func(*s3.PresignOptions), 0, len(optFns)+1)
@@ -80,7 +72,7 @@ func PresignedGet(key *string, bucket *string, dur time.Duration, optFns ...func
 
 	return presignClient.PresignGetObject(context.Background(),
 		&s3.GetObjectInput{
-			Bucket: bucket,
+			Bucket: Bucket,
 			Key:    key,
 		},
 		options...,
