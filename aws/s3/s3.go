@@ -36,13 +36,9 @@ func UploadS3(file *[]byte, filePath *string, optFns ...func(*s3.Options)) (*s3.
 	return result, fmt.Sprintf("%s/%s", S3URL, *filePath), err
 }
 
-func GetS3File(key *string, bucket *string, optFns ...func(*s3.Options)) (*s3.GetObjectOutput, error) {
-	if bucket == nil {
-		bucket = Bucket
-	}
-
+func GetS3File(key *string, optFns ...func(*s3.Options)) (*s3.GetObjectOutput, error) {
 	return S3Session.GetObject(context.TODO(), &s3.GetObjectInput{
-		Bucket: bucket,
+		Bucket: Bucket,
 		Key:    key,
 	}, optFns...)
 }
@@ -79,11 +75,7 @@ func PresignedGet(key *string, dur time.Duration, optFns ...func(*s3.PresignOpti
 	)
 }
 
-func PresignedPut(key *string, bucket *string, dur time.Duration, optFns ...func(*s3.PresignOptions)) (*v4.PresignedHTTPRequest, error) {
-	if bucket == nil {
-		bucket = Bucket
-	}
-
+func PresignedPut(key *string, dur time.Duration, optFns ...func(*s3.PresignOptions)) (*v4.PresignedHTTPRequest, error) {
 	presignClient := s3.NewPresignClient(S3Session)
 
 	options := make([]func(*s3.PresignOptions), 0, len(optFns)+1)
@@ -92,7 +84,7 @@ func PresignedPut(key *string, bucket *string, dur time.Duration, optFns ...func
 
 	return presignClient.PresignPutObject(context.Background(),
 		&s3.PutObjectInput{
-			Bucket: bucket,
+			Bucket: Bucket,
 			Key:    key,
 		},
 		options...,
